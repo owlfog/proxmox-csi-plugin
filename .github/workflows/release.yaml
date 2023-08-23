@@ -3,80 +3,32 @@ name: Release
 on:
   workflow_dispatch: {}
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
 
 jobs:
-  build-publish:
-    name: "Build image and publish"
-    timeout-minutes: 15
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Unshallow
-        run: git fetch --prune --unshallow
-
-      - name: Install Cosign
-        uses: sigstore/cosign-installer@v3.4.0
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: arm64
-      - name: Set up docker buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Github registry login
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push
-        timeout-minutes: 10
-        run: make images
-        env:
-          PUSH: "true"
-      - name: Sign images
-        timeout-minutes: 4
-        run: make images-cosign
-
-  build-publish-cli:
-    name: "Publish cli tool"
-    timeout-minutes: 15
-    runs-on: ubuntu-latest
+  release:
     permissions:
       contents: write
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - name: Unshallow
-        run: git fetch --prune --unshallow
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-      - name: Set up go
-        timeout-minutes: 5
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: 'go.mod'
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
-      - name: Generate token
-        uses: actions/create-github-app-token@7bfa3a4717ef143a604ee0a99d859b8886a96d00 # v1.9.3
-        id: token
+      - name: Install Helm
+        uses: azure/setup-helm@v3.5
+
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.5.0
         with:
-          app-id: "${{ secrets.BOT_APP_ID }}"
-          private-key: "${{ secrets.BOT_APP_PRIVATE_KEY }}"
-          owner: "${{ github.repository_owner }}"
-          repositories: homebrew-tap
-      - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v5
-        with:
-          version: latest
-          args: release --clean
+          charts_dir: charts
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          HOMEBREW_TOKEN: ${{ steps.token.outputs.token }}
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          CR_SKIP_EXISTING: true
