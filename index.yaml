@@ -2,6 +2,27 @@ apiVersion: v1
 entries:
   proxmox-csi-plugin:
   - apiVersion: v2
+    appVersion: v0.6.1
+    created: "2024-05-03T14:41:53.032910581Z"
+    description: A CSI plugin for Proxmox
+    digest: 9fc9b511ef7eb5c96c2a27fefee0b8a4daaa25f86b9d20bc1691c550d1fb599a
+    home: https://github.com/sergelogvinov/proxmox-csi-plugin
+    icon: https://proxmox.com/templates/yoo_nano2/favicon.ico
+    keywords:
+    - storage
+    - block-storage
+    - volume
+    maintainers:
+    - name: owlfog
+      url: https://github.com/owlfog
+    name: proxmox-csi-plugin
+    sources:
+    - https://github.com/sergelogvinov/proxmox-csi-plugin
+    type: application
+    urls:
+    - https://github.com/owlfog/proxmox-csi-plugin/releases/download/proxmox-csi-plugin-0.2.4/proxmox-csi-plugin-0.2.4.tgz
+    version: 0.2.4
+  - apiVersion: v2
     appVersion: v0.2.0
     created: "2023-08-23T17:59:49.305079853Z"
     description: A CSI plugin for Proxmox
@@ -22,4 +43,4 @@ entries:
     urls:
     - https://github.com/owlfog/proxmox-csi-plugin/releases/download/proxmox-csi-plugin-0.1.5/proxmox-csi-plugin-0.1.5.tgz
     version: 0.1.5
-generated: "2023-08-23T17:59:49.305085554Z"
+generated: "2024-05-03T14:41:53.03292641Z"
